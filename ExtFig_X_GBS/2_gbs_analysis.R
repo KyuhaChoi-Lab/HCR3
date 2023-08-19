@@ -22,7 +22,7 @@ library(scales)
 
 #' SETTINGS =============================================================
 #@ 1. Read samples
-dir_cotable="/datasets/data_4/nison/GBS/0_analysis/recq4/1_cotables"
+dir_cotable="cotables"
 file1=file.path(dir_cotable, "col48_cotable.csv")
 file2=file.path(dir_cotable, "col96_cotable.csv")
 file3=file.path(dir_cotable, "wt2021_cotable.csv")
