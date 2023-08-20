@@ -203,7 +203,7 @@ mean_cos_chr <- cos_summary[,1:7] %>%
         # mutate_at(vars(-c(genotype, n.lib)), funs(./n.lib)) %>%
         pivot_longer(cols=2:6, names_to="chrs", values_to="mean_co") %>%
         add_column(chr.size=rep(chr.ends, times=length(genotypes))) %>%
-        mutate(cMMb = mean_co/chr.size*10^6*100)
+        mutate(cMMb = mean_co/(chr.size*2/1e6)*100)
 ylim.co_by_chr <- c(1, max(mean_cos_chr$cMMb) * 1.2)
 
 p <- ggplot(mean_cos_chr, aes(x=chrs, y=cMMb, colour=genotype)) + 
@@ -212,7 +212,7 @@ p <- ggplot(mean_cos_chr, aes(x=chrs, y=cMMb, colour=genotype)) +
         theme_classic() +
         scale_colour_manual(values=pal) +
         # scale_x_continuous(name="Chromosome length (Mb)", labels=scales::label_number(scale=1/1000000, accuracy=1), breaks=seq(20000000, 30000000, by=5000000)) +
-        labs(x="Chromosome", y="cM/Mb")  +
+        labs(x="Chromosome", y="Crossovers (cM/Mb)")  +
         theme(text=element_text(size=9, family="Helvetica", colour="black"), axis.text=element_text(colour="black")) +
         theme(legend.key.size=unit(0.15, "inches"),
                 axis.title.x = element_blank(),
@@ -403,11 +403,15 @@ mafilt <- bind_rows(cos.all.list.bin.filt.bind, col0lang15.bin200.filt)
 ## p.co_meth_chr : drawing CO landscape on the background of mC density
 pri.ymax <- max(filter(mafilt, group != "mC")$filt.bin) * 1.1
 
+interval.len <- mafilt[1,]$bin.end - mafilt[1,]$bin.start +1
+toCm <- 1e6 / (2*interval.len) * 100
+pri.ymax.cm <- pri.ymax * toCm
+
 p.co_meth_chr <- function(dat){
         p <- ggplot() +
-                geom_line(data=filter(dat, !(group %in% c("snp", "mC"))), aes(x=cum.start, y=filt.bin/0.2*100, colour=group), size=0.4) +
-                geom_area(data=filter(dat, group=="mC"), aes(x=cum.start, y=filt.bin*pri.ymax/0.2*100/0.2), fill="grey60", alpha=0.5) +
-                scale_y_continuous(name="Crossovers (cM/Mb)", sec.axis=sec_axis(~.*0.2*0.2/100/pri.ymax, name="DNA methylation (mC/C)", breaks=c(0, 0.1, 0.2))) +
+                geom_line(data=filter(dat, !(group %in% c("snp", "mC"))), aes(x=cum.start, y=filt.bin * toCm, colour=group), size=0.4) +
+                geom_area(data=filter(dat, group=="mC"), aes(x=cum.start, y=filt.bin*pri.ymax.cm/0.25), fill="grey60", alpha=0.5) +
+                scale_y_continuous(name="Crossovers (cM/Mb)", sec.axis=sec_axis(~.*0.25/pri.ymax.cm, name="DNA methylation (mC/C)", breaks=c(0, 0.1, 0.2)), breaks=seq(0, pri.ymax.cm, by=5), limits=c(0, pri.ymax.cm)) +
                 scale_x_continuous(name="Coordinates (Mb)", labels=scales::label_number(scale=1/1000000), breaks=c(seq(1, max(dat$cum.start), 20*10^6), 120000000)) +
                 scale_colour_manual(values=pal) +
                 geom_vline(xintercept=tha.cum, colour="Black", size=0.2) +
@@ -451,10 +455,10 @@ cos.all.list.bin100 <- lapply(cos.all.list, binning, "cos", bin100k)
 
 # read col0lang15 methylation
 col0lang15.bin100 <- col0lang15.bin100 %>%
+        mutate(bin.end = bin.start + 100000 -1)
         filter(!(chrs %in% c("ChrC", "ChrM"))) %>%
         left_join(bin100k)  %>%
-        add_column(group="mC") %>%
-        select(-c("width"))
+        add_column(group="mC")
 
 # distFromTel() : convert coordinate into proportion of distance from cent to tel
 distFromTel <- function(dat, binsize, mafilt.size){
@@ -516,11 +520,14 @@ mean_cos <- prop_co %>%
         summarise(meanco=mean(bin, na.rm=TRUE)) %>%
         filter(!(group %in% c("snp", "mC")))
 
+telcen.ymax <- max(filter(prop_co, !(group %in% c("snp", "mC") | is.na(bin)))$bin)*1.1
+telcen.ymax.cm <- telcen.ymax * toCm * 2
+
 pTelCen.meth.ma9 <- ggplot() + 
-        geom_line(data=filter(prop_co, !(group %in% c("snp", "mC"))), aes(x=prop, y=bin, colour=group), size=0.4) +
-        geom_area(data=filter(prop_co, group=="mC"), aes(x=prop, y=bin*0.1), fill="yellowgreen", alpha=0.5) +
-        geom_hline(data=mean_cos, aes(yintercept=meanco, colour=group), linetype="dashed", size=0.3) +
-        scale_y_continuous(name="Crossovers per F2", sec.axis=sec_axis(~.*10, name="DNA methylation (mC/C)")) +
+        geom_line(data=filter(prop_co, !(group %in% c("snp", "mC"))), aes(x=prop, y=bin * toCm *2, colour=group), size=0.4) +
+        geom_area(data=filter(prop_co, group=="mC"), aes(x=prop, y=bin*telcen.ymax.cm/0.2), fill="grey60", alpha=0.5) +
+        geom_hline(data=mean_cos, aes(yintercept=meanco * toCm * 2, colour=group), linetype="dashed", size=0.3) +
+        scale_y_continuous(name="Crossovers (cM/Mb)", sec.axis=sec_axis(~.*0.2/telcen.ymax.cm, name="DNA methylation (mC/C)")) +
         scale_x_continuous(name="Distance from the telomere (ratio)",
                            breaks=seq(0, 1, by=0.25),
                            label=c("TEL", 0.25, 0.5, 0.75, "CEN"))+
@@ -530,14 +537,17 @@ pTelCen.meth.ma9 <- ggplot() +
               legend.title=element_text(size=7),
               legend.text=element_text(size=7),
               legend.position="top") +
-        theme(text=element_text(size=9, family="helvetica", colour="black"),
+        theme(text=element_text(size=9, family="Helvetica", colour="black"),
         axis.text=element_text(size=7, colour="black"))
 
         
 #svg(file=paste0(prefix, "_snp_telcen-ma9.svg"), width=3.25, height=2.25)
 #pTelCen.ma9
 #dev.off()
-svg(file=paste0(prefix, "_meth_telcen-ma9.svg"), width=3.25, height=2.25)
+pdf(file=file.path(dirout, paste0(prefix, "_meth_telcen-ma9.pdf")), width=3.25, height=2.25)
+pTelCen.meth.ma9
+dev.off()
+png(file=file.path(dirout, paste0(prefix, "_meth_telcen-ma9.png")), width=3.25, height=2.25, res=300, unit="in")
 pTelCen.meth.ma9
 dev.off()
 
