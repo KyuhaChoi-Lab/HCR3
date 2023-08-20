@@ -19,21 +19,30 @@
 library(tidyverse)
 library(colorspace)
 library(scales)
+library(khroma)
 
 #' SETTINGS =============================================================
 #@ 1. Read samples
 dir_cotable="cotables"
-file1=file.path(dir_cotable, "col48_cotable.csv")
-file2=file.path(dir_cotable, "col96_cotable.csv")
-file3=file.path(dir_cotable, "wt2021_cotable.csv")
-file4=file.path(dir_cotable, "recq4_cotable.csv")
-file5=file.path(dir_cotable, "meimigs-hsbp-recq4_cotable.csv")
+file1=file.path(dir_cotable, "WT_2019_cotable.txt")
+file2=file.path(dir_cotable, "WT_2020_cotable.txt")
+file3=file.path(dir_cotable, "WT_2021_cotable.txt")
+file4=file.path(dir_cotable, "20230811_GBS_J3_mJ3_cotable.txt")
+file5=file.path(dir_cotable, "20230727_GBS_pSPO11-1_mJ3_cotable.txt")
 
-sample1=read_csv(file1)
-sample2=read_csv(file2)
-sample3=read_csv(file3)
-sample4=read_csv(file4)
-sample5=read_csv(file5)
+readCotable <- function(file) {
+        dat <- read_csv(file) %>%
+                mutate(lib = str_replace(lib, "results/06_tiger/lib", "")) %>%
+                mutate(lib = str_replace(lib, "_MappedOn_tair10", "")) %>%
+                mutate(lib = as.numeric(lib))
+        return(dat)
+}
+
+sample1=readCotable(file1)
+sample2=readCotable(file2)
+sample3=readCotable(file3)
+sample4=readCotable(file4)
+sample5=readCotable(file5)
 
 #@ 2. Merge cotables from the same genotype
 ## In case cotable from more than one sample needs to be merged for a genotype,
@@ -41,46 +50,41 @@ sample5=read_csv(file5)
 ## Then put that merged cotable file into genotype[n] variables 
 sample2$lib <- sample2$lib + max(sample1$lib)
 sample3$lib <- sample3$lib + max(sample2$lib)
-genotype1=bind_rows(sample1, sample2, sample3)
-genotype2=bind_rows(sample4)
-genotype3=bind_rows(sample5)
+wt=bind_rows(sample1, sample2, sample3)
+mj3_2=filter(sample4, lib <=48)
+mj3_3=filter(sample4, lib <=96 & lib >48)
+pspo11=sample5
 
 ## genotypes of the samples
-genotypes=c("col", "recq4", "recq4-hcr2")
+genotypes=c("WT", "mJ3-2", "mJ3-3", "pSPO11_mJ3")
 
 #@ 3. colors for each genotype
 # below is for four genotypes
-pal <- c("#377eb8", "#e41a1c", "#984ea3")
-#pal <- c("#377eb8", "#e41a1c", "#984ea3", "#ff7f00")
-## blue, red 
+light <- colour("light")(9)
+pal <- light[c("light blue", "pear", "olive", "orange")] 
+names(pal) <- genotypes
 
 #@ 4. Merge the cotables from different genotypes
-cos.all.list <- list(genotype1, genotype2, genotype3)
+cos.all.list <- list(wt, mj3_2, mj3_3, pspo11)
 names(cos.all.list) <- genotypes
-cos.all <- bind_rows(cos.all.list, .id="genotype")
+cos.all <- bind_rows(cos.all.list, .id="genotype") %>%
+        mutate(genotype = factor(genotype, levels=genotypes))
 
 ## count the number of crossover for each individual. 
-cos.all.count <- bind_rows(genotype1, genotype2, genotype3, .id="group")
-cos.all.count  <- cos.all.count %>%
-        add_column(genotype=rep(genotypes, times=table(cos.all.count$group))) %>%
+cos.all.count <- bind_rows(cos.all.list, .id="genotype") %>%
         group_by(genotype) %>%
-        count(lib)
+        count(lib) %>%
+        mutate(genotype = factor(genotype, levels=genotypes))
 #@ 5. prefix and dirout
-prefix="recq4"
-dirout=paste0("/datasets/data_4/nison/GBS/0_analysis/recq4/2_analysis")
-setwd(dirout)
-
-#@ 6. Col vs Ler complete SNPs 
-coller.comp <- read_tsv("/home/nison/work/pipelines/GBS/ColLer_markers/BC.complete.tsv", col_names=F)
-snp_colnames <- c("chrs", "snp", "ref", "n.ref", "alt", "n.alt")
-colnames(coller.comp) <- snp_colnames
+prefix="independent_mj3"
+dirout=paste0("results")
+# setwd(dirout)
 
 #@ 7. Col-0 DNA methylation binnded by 200k/100k base
-col0lang15.bin200 <- read_csv("/home/nison/work/col0Lang15_wgbs/col0Lang15_window2e+05_C.csv", col_names = TRUE)
+col0lang15.bin200 <- read_csv("data/col0Lang15_window2e+05_C.csv", col_names = TRUE)
 colnames(col0lang15.bin200) <- c("chrs", "bin.start", "bin.end", "width", "strand", "C", "mC", "bin")
-
-col0lang15.bin100 <- read_csv("/home/nison/work/col0Lang15_wgbs/col0Lang15_window1e+05_C.csv", col_names = TRUE)
-colnames(col0lang15.bin100) <- c("chrs", "bin.start", "bin.end", "width", "strand", "C", "mC", "bin")
+col0lang15.bin100 <- read_tsv("data/SRR11304866_C_TAIR10_window100kb_step100kb.tsv", col_names = TRUE)
+colnames(col0lang15.bin100) <- c("chrs", "bin.start", "bin.end", "bin")
 #=======================================================================================
 
 #' 0. chromosome info 
@@ -110,22 +114,27 @@ north.start <- c(11420001, 910001, 10390001, 1070001, 8890001)
 south.end <- c(18270000, 7320000, 16730000, 6630000, 15550000)
 
 #' 1. Statistical tests of COs per F2 ========
-genotype1.count <- filter(cos.all.count, genotype==genotypes[1])$n
-genotype2.count <- filter(cos.all.count, genotype==genotypes[2])$n
-genotype3.count <- filter(cos.all.count, genotype==genotypes[3])$n
+wt.count <- filter(cos.all.count, genotype==genotypes[1])$n
+mj3_2.count <- filter(cos.all.count, genotype==genotypes[2])$n
+mj3_3.count <- filter(cos.all.count, genotype==genotypes[3])$n
+pspo11.count <- filter(cos.all.count, genotype==genotypes[4])$n
+count.list <- list(wt.count, mj3_2.count, mj3_3.count, pspo11.count)
 
-con <- file(paste0(prefix, "_CO_statistical-test.txt"))
+con <- file(file.path(dirout, paste0(prefix, "_CO_statistical-test.txt")))
+
 sink(con, append=TRUE)
 # students t-test
-t.test(genotype1.count, genotype2.count)
-t.test(genotype1.count, genotype3.count)
-t.test(genotype2.count, genotype3.count)
-
-# wilcox test
-#code <- c(rep(2,length(genotype2.count)),c(rep(3,length(genotype3.count))))
-#dat <- c(genotype2.count, genotype3.count)
-#data <- cbind(code,dat)
-#wilcox.test(dat ~ code,data=data)
+ttest_mat <- matrix(, nrow=length(count.list)-1, ncol=length(count.list))
+rownames(ttest_mat) <- genotypes[1:3]
+colnames(ttest_mat) <- genotypes[1:4]
+for (i in 1:(length(count.list)-1)){
+        ctrl_group <- count.list[[i]]
+        for (j in i:length(count.list)) {
+                test_group <- count.list[[j]]
+                ttest_mat[i,j] <- t.test(ctrl_group, test_group)$p.value
+        }
+}
+print(ttest_mat)
 sink()
 
 
@@ -136,21 +145,28 @@ mean_co <- cos.all.count %>%
         summarise(co=mean(n))
 
 hist_bin <- max(cos.all.count$n)-1
-co_hist <- ggplot(cos.all.count, aes(x=n, fill=genotype)) +
-        geom_histogram(bins=hist_bin, position="dodge") +
-        scale_fill_manual(values=pal) +
-        geom_vline(data=mean_co, aes(xintercept=co, colour=genotype), linetype="dashed") +
-        scale_colour_manual(values=pal) +
+co_hist <- ggplot(cos.all.count, aes(x=n, after_stat(ncount))) +
+        geom_histogram(bins=hist_bin, position="dodge", fill="white", colour="black") +
+        geom_vline(data=mean_co, aes(xintercept=co), linetype="dashed", colour="red") +
+        facet_grid(rows="genotype") +
+        # scale_fill_manual(values=pal) +
+        # scale_colour_manual(values=pal) +
         theme_classic() +
-        theme(text=element_text(size=9, family="helvetica", colour="black"), axis.text=element_text(colour="black")) +
-        labs(x="crossovers", y="frequency") +
+        theme(text=element_text(size=9, family="Helvetica", colour="black"), axis.text=element_text(colour="black")) +
+        labs(x="Crossovers", y="Ratio") +
         theme(legend.key.size=unit(0.1, "inches"),
               legend.title=element_text(size=7),
               legend.text=element_text(size=7),
-              legend.position="top")
+              legend.position="top") +
+        theme(strip.background = element_rect(colour=NA, fill = "white"))
+        # theme(panel.border = element_rect(colour="black", fill=NA, linewidth=1)) +
+        # theme(axis.line = element_line(colour="black", linewidth=0))
 
 
-svg(file=paste0(prefix, "_co_hist.svg"), width=2.25, height=2.25)
+pdf(file=file.path(dirout, paste0(prefix, "_co_hist.pdf")), width=2.75, height=3.5)
+co_hist
+dev.off()
+png(file=file.path(dirout, paste0(prefix, "_co_hist.png")), width=2.75, height=3.5, unit="in", res=300)
 co_hist
 dev.off()
 
@@ -182,57 +198,64 @@ write_csv(cos_summary, file="cos.all.counts_summary.csv")
 
 
 #' 4. Draw crossovers per chromosome plot
-ylim.co_by_chr <- c(1, 8)
 mean_cos_chr <- cos_summary[,1:7] %>%
-        mutate_at(vars(-c(genotype, n.lib)), funs(./n.lib)) %>%
+        mutate(across(Chr1:Chr5, ~.x/n.lib)) %>%
+        # mutate_at(vars(-c(genotype, n.lib)), funs(./n.lib)) %>%
         pivot_longer(cols=2:6, names_to="chrs", values_to="mean_co") %>%
-        add_column(chr.size=rep(chr.ends, times=length(genotypes)))
+        add_column(chr.size=rep(chr.ends, times=length(genotypes))) %>%
+        mutate(cMMb = mean_co/chr.size*10^6*100)
+ylim.co_by_chr <- c(1, max(mean_cos_chr$cMMb) * 1.2)
 
-p <- ggplot(mean_cos_chr, aes(x=chr.size, y=mean_co, colour=genotype)) + 
-        geom_point(aes(group=genotype), size=2) +
+p <- ggplot(mean_cos_chr, aes(x=chrs, y=cMMb, colour=genotype)) + 
+        # geom_point(aes(group=genotype), size=2) +
+        geom_point() +
         theme_classic() +
         scale_colour_manual(values=pal) +
-        scale_x_continuous(name="Chromosome length (Mb)", labels=scales::label_number(scale=1/1000000, accuracy=1), breaks=seq(20000000, 30000000, by=5000000)) +
-        labs(x="Chromosome", y="Crossovers per chr per F2")  +
-        theme(text=element_text(size=9, family="helvetica", colour="black"), axis.text=element_text(colour="black")) +
+        # scale_x_continuous(name="Chromosome length (Mb)", labels=scales::label_number(scale=1/1000000, accuracy=1), breaks=seq(20000000, 30000000, by=5000000)) +
+        labs(x="Chromosome", y="cM/Mb")  +
+        theme(text=element_text(size=9, family="Helvetica", colour="black"), axis.text=element_text(colour="black")) +
         theme(legend.key.size=unit(0.15, "inches"),
+                axis.title.x = element_blank(),
               legend.position="top",
               legend.title=element_text(size=7),
-              legend.text=element_text(size=7)) +
+              legend.text=element_text(size=7)) + 
 		ylim(ylim.co_by_chr)
 
-svg(paste0(prefix, "_mean_co_per_chrlen.svg"), width=2.25, height=2.25)
+pdf(file.path(dirout, paste0(prefix, "_mean_co_per_chrlen.pdf")), width=2.75, height=2.25)
+print(p)
+dev.off()
+png(file.path(dirout, paste0(prefix, "_mean_co_per_chrlen.png")), width=2.75, height=2.25, unit="in", res=300)
 print(p)
 dev.off()
 
 ## statistical test for each chromosome
-genotype1.chr <- group_by(genotype1, lib, chrs) %>%
-		summarise(nco=n())
-genotype2.chr <- group_by(genotype2, lib, chrs) %>%
-		summarise(nco=n())
-genotype3.chr <- group_by(genotype3, lib, chrs) %>%
-		summarise(nco=n())
+# genotype1.chr <- group_by(genotype1, lib, chrs) %>%
+# 		summarise(nco=n())
+# genotype2.chr <- group_by(genotype2, lib, chrs) %>%
+# 		summarise(nco=n())
+# genotype3.chr <- group_by(genotype3, lib, chrs) %>%
+# 		summarise(nco=n())
 
-t_test.chr <- function(chr){
-		geno2 <- filter(genotype2.chr, chrs==chr)$nco
-		geno3 <- filter(genotype3.chr, chrs==chr)$nco
-		result <- t.test(geno2, geno3)
-		print(result)
-		}
+# t_test.chr <- function(chr){
+# 		geno2 <- filter(genotype2.chr, chrs==chr)$nco
+# 		geno3 <- filter(genotype3.chr, chrs==chr)$nco
+# 		result <- t.test(geno2, geno3)
+# 		print(result)
+# 		}
 
-t_test_by_chr <- file(paste0(prefix, "_t-test_by_chr.txt"))
-sink(t_test_by_chr, append=TRUE)
-print("Chr1")
-t_test.chr1 <- t_test.chr("Chr1")
-print("Chr2")
-t_test.chr1 <- t_test.chr("Chr2")
-print("Chr3")
-t_test.chr1 <- t_test.chr("Chr3")
-print("Chr4")
-t_test.chr1 <- t_test.chr("Chr4")
-print("Chr5")
-t_test.chr1 <- t_test.chr("Chr5")
-sink()
+# t_test_by_chr <- file(paste0(prefix, "_t-test_by_chr.txt"))
+# sink(t_test_by_chr, append=TRUE)
+# print("Chr1")
+# t_test.chr1 <- t_test.chr("Chr1")
+# print("Chr2")
+# t_test.chr1 <- t_test.chr("Chr2")
+# print("Chr3")
+# t_test.chr1 <- t_test.chr("Chr3")
+# print("Chr4")
+# t_test.chr1 <- t_test.chr("Chr4")
+# print("Chr5")
+# t_test.chr1 <- t_test.chr("Chr5")
+# sink()
 
 
 #' 5. arm versus pericentromere locations =============
@@ -333,10 +356,6 @@ cos.all.list.bin <- lapply(cos.all.list, binning, "cos", bin200k)
 #col0.co.bin$bin <- col0.co.bin$bin/length(unique(col0.co$lib))
 #hcr2.co.bin$bin <- hcr2.co.bin$bin/length(unique(hcr2.co$lib))
 
-coller.comp.bin <- binning(coller.comp, "snp", bin200k)
-
-
-
 # Read Col0 mC tiled by 200kb.
 col0lang15.bin200 <- col0lang15.bin200 %>%
         filter(!(chrs %in% c("ChrC", "ChrM"))) %>%
@@ -370,12 +389,9 @@ mafilter <- function(dat, k){
 cos.all.list.bin.filt <- lapply(cos.all.list.bin, mafilter, 5)
 cos.all.list.bin.filt.bind <- bind_rows(cos.all.list.bin.filt, .id="group")
 
-coller.comp.bin.filt <- mafilter(coller.comp.bin, 9)
-coller.comp.bin.filt$group="snp"
-
 col0lang15.bin200.filt <- mafilter(col0lang15.bin200, 5)
 
-mafilt <- bind_rows(cos.all.list.bin.filt.bind, coller.comp.bin.filt, col0lang15.bin200.filt) 
+mafilt <- bind_rows(cos.all.list.bin.filt.bind, col0lang15.bin200.filt) 
 
 
 # Draw chromosome plots
@@ -385,31 +401,13 @@ mafilt <- bind_rows(cos.all.list.bin.filt.bind, coller.comp.bin.filt, col0lang15
 ## snp density : "Dark2"
 ## p.co_chr : drawing CO landscape on the background of SNP density
 ## p.co_meth_chr : drawing CO landscape on the background of mC density
-p.co_chr <- function(dat){
-        p <- ggplot() +
-                geom_area(data=filter(dat, group=="snp"), aes(x=cum.start, y=filt.bin), fill="lightblue2", alpha=0.5) +
-                geom_line(data=filter(dat, !(group %in% c("snp", "mC"))), aes(x=cum.start, y=filt.bin*32000, colour=group), size=0.4) +
-                scale_y_continuous(name="SNP density", sec.axis=sec_axis(~.*(3.125E-05), name="Crossovers per F2")) +
-                scale_x_continuous(name="Coordinates (Mb)", labels=scales::label_number(scale=1/1000000), breaks=c(seq(1, max(dat$cum.start), 20*10^6), 120000000)) +
-                scale_colour_manual(values=pal) +
-                geom_vline(xintercept=tha.cum, colour="Black", size=0.2) +
-                geom_vline(xintercept=centromeres, colour="Black", linetype="dashed", size=0.2) +
-                theme_classic() +
-                theme(legend.key.size=unit(0.2, "inches"),
-                legend.position="top",
-                legend.title=element_text(size=7),
-                legend.text=element_text(size=7)) +
-                theme(text=element_text(size=9, family="helvetica", colour="black"),
-                axis.text=element_text(colour="black", size=7))
-
-        return(p)
-}
+pri.ymax <- max(filter(mafilt, group != "mC")$filt.bin) * 1.1
 
 p.co_meth_chr <- function(dat){
         p <- ggplot() +
-                geom_line(data=filter(dat, !(group %in% c("snp", "mC"))), aes(x=cum.start, y=filt.bin, colour=group), size=0.4) +
-                geom_area(data=filter(dat, group=="mC"), aes(x=cum.start, y=filt.bin*0.2), fill="yellowgreen", alpha=0.5) +
-                scale_y_continuous(name="Crossovers per F2", sec.axis=sec_axis(~.*5, name="DNA methylation (mC/C)")) +
+                geom_line(data=filter(dat, !(group %in% c("snp", "mC"))), aes(x=cum.start, y=filt.bin/0.2*100, colour=group), size=0.4) +
+                geom_area(data=filter(dat, group=="mC"), aes(x=cum.start, y=filt.bin*pri.ymax/0.2*100/0.2), fill="grey60", alpha=0.5) +
+                scale_y_continuous(name="Crossovers (cM/Mb)", sec.axis=sec_axis(~.*0.2*0.2/100/pri.ymax, name="DNA methylation (mC/C)", breaks=c(0, 0.1, 0.2))) +
                 scale_x_continuous(name="Coordinates (Mb)", labels=scales::label_number(scale=1/1000000), breaks=c(seq(1, max(dat$cum.start), 20*10^6), 120000000)) +
                 scale_colour_manual(values=pal) +
                 geom_vline(xintercept=tha.cum, colour="Black", size=0.2) +
@@ -419,20 +417,18 @@ p.co_meth_chr <- function(dat){
                 legend.position="top",
                 legend.title=element_text(size=7),
                 legend.text=element_text(size=7)) +
-                theme(text=element_text(size=9, family="helvetica", colour="black"),
+                theme(text=element_text(size=9, family="Helvetica", colour="black"),
                 axis.text=element_text(colour="black", size=7))
 
         return(p)
 }
 
-#p.co_snp_land <- p.co_chr(mafilt)
 p.co_meth_land <- p.co_meth_chr(mafilt)
-#
-#svg(file=paste0(prefix, "_co-snp_landscape_ma5.svg"), width=8, height=2)
-#p.co_snp_land
-#dev.off()
 
-svg(file=paste0(prefix, "_co-meth_landscape_ma5.svg"), width=8, height=2)
+pdf(file=file.path(dirout, paste0(prefix, "_co-meth_landscape_ma5.pdf")), width=8, height=2)
+p.co_meth_land
+dev.off()
+png(file=file.path(dirout, paste0(prefix, "_co-meth_landscape_ma5.png")), width=8, height=2, unit="in", res=300)
 p.co_meth_land
 dev.off()
 
@@ -458,15 +454,16 @@ col0lang15.bin100 <- col0lang15.bin100 %>%
         filter(!(chrs %in% c("ChrC", "ChrM"))) %>%
         left_join(bin100k)  %>%
         add_column(group="mC") %>%
-        select(-c("strand", "C", "mC", "width"))
+        select(-c("width"))
 
 # distFromTel() : convert coordinate into proportion of distance from cent to tel
 distFromTel <- function(dat, binsize, mafilt.size){
-#		dat <- cos.all.list.bin100$hcr2
-#		binsize <- 0.01
-#		mafilt.size <- 9
+		# dat <- cos.all.list.bin100$hcr2
+		# binsize <- 0.01
+		# mafilt.size <- 9
 
-        dat <- arrange(dat, chrs)
+        # dat <- col0lang15.bin100
+#        dat <- arrange(dat, chrs)
         dat$cent <- rep(cent, times=table(dat$chrs))
         dat$end <- rep(chr.ends, times=table(dat$chrs))
         
@@ -480,7 +477,7 @@ distFromTel <- function(dat, binsize, mafilt.size){
                 mutate(coord.prop=(end-bin.start)/(end-cent))
         
         prop <- bind_rows(left, right)
-		prop <- filter(prop, chrs != "Chr3")
+		# prop <- filter(prop, chrs != "Chr3")
 		# exclude chr3 from the TEL-CEN analysis
         
         collect_bin <- NULL
@@ -508,36 +505,16 @@ cos.all.list.bin100 <- lapply(cos.all.list, binning, "cos", bin100k)
 cos.all.list.bin100.prop <- lapply(cos.all.list.bin100, distFromTel, 0.01, 9)
 cos.all.list.bin100.prop.bind <- bind_rows(cos.all.list.bin100.prop, .id="group")
 
-coller.comp.bin100 <- binning(coller.comp, "snp", bin100k)
-coller.comp.prop <- distFromTel(coller.comp.bin100, 0.01, 9)
-coller.comp.prop$group="snp"
 col0lang15.meth.prop <- distFromTel(col0lang15.bin100, 0.01, 9)
 col0lang15.meth.prop$group="mC"
 
 
 
-prop_co <- bind_rows(cos.all.list.bin100.prop.bind, coller.comp.prop, col0lang15.meth.prop)
+prop_co <- bind_rows(cos.all.list.bin100.prop.bind, col0lang15.meth.prop)
 mean_cos <- prop_co %>%
         group_by(group) %>%
         summarise(meanco=mean(bin, na.rm=TRUE)) %>%
         filter(!(group %in% c("snp", "mC")))
-
-pTelCen.ma9 <- ggplot() + 
-        geom_area(data=filter(prop_co, group=="snp"), aes(x=prop, y=bin), fill="lightblue2", alpha=0.5) +
-        geom_hline(data=mean_cos, aes(yintercept=meanco*50000, colour=group), linetype="dashed", size=0.3) +
-        scale_y_continuous(name="SNP density", sec.axis=sec_axis(~.*(2E-05), name="Crossovers per F2")) +
-#        coord_cartesian(ylim=c(100, 750)) +
-        scale_x_continuous(name="Distance from the telomere (ratio)",
-                           breaks=seq(0, 1, by=0.25),
-                           label=c("TEL", 0.25, 0.5, 0.75, "CEN"))+
-        scale_colour_manual(values=pal) +
-        theme_classic() +
-        theme(legend.key.size=unit(0.1, "inches"),
-              legend.title=element_text(size=7),
-              legend.text=element_text(size=7),
-              legend.position="top") +
-        theme(text=element_text(size=9, family="helvetica", colour="black"),
-        axis.text=element_text(size=7, colour="black"))
 
 pTelCen.meth.ma9 <- ggplot() + 
         geom_line(data=filter(prop_co, !(group %in% c("snp", "mC"))), aes(x=prop, y=bin, colour=group), size=0.4) +
