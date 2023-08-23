@@ -20,6 +20,7 @@ library(tidyverse)
 library(colorspace)
 library(scales)
 library(khroma)
+library(lemon)
 
 #' SETTINGS =============================================================
 #@ 1. Read samples
@@ -145,10 +146,12 @@ mean_co <- cos.all.count %>%
         summarise(co=mean(n))
 
 hist_bin <- max(cos.all.count$n)-1
-co_hist <- ggplot(cos.all.count, aes(x=n, after_stat(ncount))) +
+co_hist <- ggplot(cos.all.count, aes(x=n, after_stat(density))) +
         geom_histogram(bins=hist_bin, position="dodge", fill="white", colour="black") +
         geom_vline(data=mean_co, aes(xintercept=co), linetype="dashed", colour="red") +
-        facet_grid(rows="genotype") +
+        facet_rep_grid(genotype ~ ., repeat.tick.labels="all") +
+        scale_y_continuous(breaks=c(0, 0.1, 0.2)) +
+        # facet_grid(rows="genotype") +
         # scale_fill_manual(values=pal) +
         # scale_colour_manual(values=pal) +
         theme_classic() +
@@ -158,16 +161,50 @@ co_hist <- ggplot(cos.all.count, aes(x=n, after_stat(ncount))) +
               legend.title=element_text(size=7),
               legend.text=element_text(size=7),
               legend.position="top") +
-        theme(strip.background = element_rect(colour=NA, fill = "white"))
+        theme(strip.background = element_rect(colour=NA, fill = "white")) +
+        theme(axis.line = element_line(colour="black", linewidth=0.5))
         # theme(panel.border = element_rect(colour="black", fill=NA, linewidth=1)) +
         # theme(axis.line = element_line(colour="black", linewidth=0))
 
+cos.all.count.stick <- cos.all.count %>%
+    group_by(genotype, n) %>%
+    summarise(freq=n()) %>%
+    mutate(ratio = freq/sum(freq))
 
-pdf(file=file.path(dirout, paste0(prefix, "_co_hist.pdf")), width=2.75, height=3.5)
+co_hist_stick <- ggplot(cos.all.count.stick, aes(x=n, y=ratio)) +
+        # geom_histogram(bins=hist_bin, position="dodge", fill="white", colour="black") +
+        geom_col(width=0.2, fill="black") +
+        geom_vline(data=mean_co, aes(xintercept=co), linetype="dashed", colour="red") +
+        facet_rep_grid(genotype ~ ., repeat.tick.labels="all") +
+        scale_y_continuous(breaks=c(0, 0.1, 0.2)) +
+        # facet_wrap(vars(genotype), ncol=1) +
+        # facet_grid(rows="genotype") +
+        # scale_fill_manual(values=pal) +
+        # scale_colour_manual(values=pal) +
+        theme_classic() +
+        theme(text=element_text(size=9, family="Helvetica", colour="black"), axis.text=element_text(colour="black")) +
+        labs(x="Crossovers", y="Ratio") +
+        theme(legend.key.size=unit(0.1, "inches"),
+              legend.title=element_text(size=7),
+              legend.text=element_text(size=7),
+              legend.position="top") +
+        theme(strip.background = element_rect(colour=NA, fill = "white")) +
+        theme(axis.line = element_line(colour="black", linewidth=0.5))
+        # theme(panel.border = element_rect(colour="black", fill=NA, linewidth=1)) +
+
+
+pdf(file=file.path(dirout, paste0(prefix, "_co_hist.pdf")), width=2, height=3.5)
 co_hist
 dev.off()
-png(file=file.path(dirout, paste0(prefix, "_co_hist.png")), width=2.75, height=3.5, unit="in", res=300)
+png(file=file.path(dirout, paste0(prefix, "_co_hist.png")), width=2, height=3.5, unit="in", res=300)
 co_hist
+dev.off()
+
+pdf(file=file.path(dirout, paste0(prefix, "_co_hist_stick.pdf")), width=2, height=3.5)
+co_hist_stick
+dev.off()
+png(file=file.path(dirout, paste0(prefix, "_co_hist_stick.png")), width=2, height=3.5, unit="in", res=300)
+co_hist_stick
 dev.off()
 
 
