@@ -61,8 +61,8 @@ genotypes=c("WT", "mJ3-2", "mJ3-3", "pSPO11_mJ3")
 
 #@ 3. colors for each genotype
 # below is for four genotypes
-light <- colour("light")(9)
-pal <- light[c("light blue", "pear", "olive", "orange")] 
+light <- colour("bright")(7)
+pal <- light[c("blue", "red", "purple", "green")] 
 names(pal) <- genotypes
 
 #@ 4. Merge the cotables from different genotypes
@@ -241,27 +241,26 @@ mean_cos_chr <- cos_summary[,1:7] %>%
         pivot_longer(cols=2:6, names_to="chrs", values_to="mean_co") %>%
         add_column(chr.size=rep(chr.ends, times=length(genotypes))) %>%
         mutate(cMMb = mean_co/(chr.size*2/1e6)*100)
-ylim.co_by_chr <- c(1, max(mean_cos_chr$cMMb) * 1.2)
+ylim.co_by_chr <- c(1, max(mean_cos_chr$mean_co) * 1.1)
 
-p <- ggplot(mean_cos_chr, aes(x=chrs, y=cMMb, colour=genotype)) + 
-        # geom_point(aes(group=genotype), size=2) +
-        geom_point() +
+p <- ggplot(mean_cos_chr, aes(x=chr.size, y=mean_co, colour=genotype)) + 
+        geom_point(aes(group=genotype), size=2) +
+        # geom_point() +
         theme_classic() +
         scale_colour_manual(values=pal) +
-        # scale_x_continuous(name="Chromosome length (Mb)", labels=scales::label_number(scale=1/1000000, accuracy=1), breaks=seq(20000000, 30000000, by=5000000)) +
-        labs(x="Chromosome", y="Crossovers (cM/Mb)")  +
+        scale_x_continuous(name="Chromosome length (Mb)", labels=scales::label_number(scale=1/1000000, accuracy=1), breaks=seq(20000000, 30000000, by=5000000)) +
+        labs(x="Chromosome length (Mb)", y="Crossovers per chr per F2")  +
         theme(text=element_text(size=9, family="Helvetica", colour="black"), axis.text=element_text(colour="black")) +
         theme(legend.key.size=unit(0.15, "inches"),
-                axis.title.x = element_blank(),
               legend.position="top",
               legend.title=element_text(size=7),
               legend.text=element_text(size=7)) + 
 		ylim(ylim.co_by_chr)
 
-pdf(file.path(dirout, paste0(prefix, "_mean_co_per_chrlen.pdf")), width=2.75, height=2.25)
+pdf(file.path(dirout, paste0(prefix, "_mean_co_per_chrlen.pdf")), width=2.25, height=2.25)
 print(p)
 dev.off()
-png(file.path(dirout, paste0(prefix, "_mean_co_per_chrlen.png")), width=2.75, height=2.25, unit="in", res=300)
+png(file.path(dirout, paste0(prefix, "_mean_co_per_chrlen.png")), width=2.25, height=2.25, unit="in", res=300)
 print(p)
 dev.off()
 
@@ -428,7 +427,8 @@ cos.all.list.bin.filt.bind <- bind_rows(cos.all.list.bin.filt, .id="group")
 
 col0lang15.bin200.filt <- mafilter(col0lang15.bin200, 5)
 
-mafilt <- bind_rows(cos.all.list.bin.filt.bind, col0lang15.bin200.filt) 
+mafilt <- bind_rows(cos.all.list.bin.filt.bind, col0lang15.bin200.filt)  %>%
+    mutate(group = factor(group, levels=c("WT", "mJ3-2", "mJ3-3", "pSPO11_mJ3", "mC")))
 
 
 # Draw chromosome plots
@@ -447,7 +447,7 @@ pri.ymax.cm <- pri.ymax * toCm
 p.co_meth_chr <- function(dat){
         p <- ggplot() +
                 geom_line(data=filter(dat, !(group %in% c("snp", "mC"))), aes(x=cum.start, y=filt.bin * toCm, colour=group), size=0.4) +
-                geom_area(data=filter(dat, group=="mC"), aes(x=cum.start, y=filt.bin*pri.ymax.cm/0.25), fill="grey60", alpha=0.5) +
+                geom_area(data=filter(dat, group=="mC"), aes(x=cum.start, y=filt.bin*pri.ymax.cm/0.25), fill="yellowgreen", alpha=0.5) +
                 scale_y_continuous(name="Crossovers (cM/Mb)", sec.axis=sec_axis(~.*0.25/pri.ymax.cm, name="DNA methylation (mC/C)", breaks=c(0, 0.1, 0.2)), breaks=seq(0, pri.ymax.cm, by=5), limits=c(0, pri.ymax.cm)) +
                 scale_x_continuous(name="Coordinates (Mb)", labels=scales::label_number(scale=1/1000000), breaks=c(seq(1, max(dat$cum.start), 20*10^6), 120000000)) +
                 scale_colour_manual(values=pal) +
@@ -551,7 +551,8 @@ col0lang15.meth.prop$group="mC"
 
 
 
-prop_co <- bind_rows(cos.all.list.bin100.prop.bind, col0lang15.meth.prop)
+prop_co <- bind_rows(cos.all.list.bin100.prop.bind, col0lang15.meth.prop) %>%
+    mutate(group = factor(group, levels=c("WT", "mJ3-2", "mJ3-3", "pSPO11_mJ3", "mC")))
 mean_cos <- prop_co %>%
         group_by(group) %>%
         summarise(meanco=mean(bin, na.rm=TRUE)) %>%
@@ -562,7 +563,7 @@ telcen.ymax.cm <- telcen.ymax * toCm * 2
 
 pTelCen.meth.ma9 <- ggplot() + 
         geom_line(data=filter(prop_co, !(group %in% c("snp", "mC"))), aes(x=prop, y=bin * toCm *2, colour=group), size=0.4) +
-        geom_area(data=filter(prop_co, group=="mC"), aes(x=prop, y=bin*telcen.ymax.cm/0.2), fill="grey60", alpha=0.5) +
+        geom_area(data=filter(prop_co, group=="mC"), aes(x=prop, y=bin*telcen.ymax.cm/0.2), fill="yellowgreen", alpha=0.5) +
         geom_hline(data=mean_cos, aes(yintercept=meanco * toCm * 2, colour=group), linetype="dashed", size=0.3) +
         scale_y_continuous(name="Crossovers (cM/Mb)", sec.axis=sec_axis(~.*0.2/telcen.ymax.cm, name="DNA methylation (mC/C)")) +
         scale_x_continuous(name="Distance from the telomere (ratio)",
