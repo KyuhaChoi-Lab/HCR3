@@ -1,0 +1,234 @@
+
+        ==========     _____ _    _ ____  _____  ______          _____  
+        =====         / ____| |  | |  _ \|  __ \|  ____|   /\   |  __ \ 
+          =====      | (___ | |  | | |_) | |__) | |__     /  \  | |  | |
+            ====      \___ \| |  | |  _ <|  _  /|  __|   / /\ \ | |  | |
+              ====    ____) | |__| | |_) | | \ \| |____ / ____ \| |__| |
+        ==========   |_____/ \____/|____/|_|  \_\______/_/    \_\_____/
+	  v2.0.3
+
+//========================== featureCounts setting ===========================\\
+||                                                                            ||
+||             Input files : 21 BAM files                                     ||
+||                                                                            ||
+||                           Col_s_1_Aligned.sortedByCoord.out.bam            ||
+||                           Col_s_2_Aligned.sortedByCoord.out.bam            ||
+||                           Col_s_3_Aligned.sortedByCoord.out.bam            ||
+||                           Col_b_1_Aligned.sortedByCoord.out.bam            ||
+||                           Col_b_2_Aligned.sortedByCoord.out.bam            ||
+||                           Col_b_3_Aligned.sortedByCoord.out.bam            ||
+||                           col-bud-1_Aligned.sortedByCoord.out.bam          ||
+||                           col-bud-2_Aligned.sortedByCoord.out.bam          ||
+||                           col-bud-3_Aligned.sortedByCoord.out.bam          ||
+||                           hcr3-bud-1_Aligned.sortedByCoord.out.bam         ||
+||                           hcr3-bud-2_Aligned.sortedByCoord.out.bam         ||
+||                           hcr3-bud-3_Aligned.sortedByCoord.out.bam         ||
+||                           Col_bud_1_Aligned.sortedByCoord.out.bam          ||
+||                           Col_bud_2_Aligned.sortedByCoord.out.bam          ||
+||                           Col_bud_3_Aligned.sortedByCoord.out.bam          ||
+||                           j3-3_bud_1_Aligned.sortedByCoord.out.bam         ||
+||                           j3-3_bud_2_Aligned.sortedByCoord.out.bam         ||
+||                           j3-3_bud_3_Aligned.sortedByCoord.out.bam         ||
+||                           j2-2_bud_1_Aligned.sortedByCoord.out.bam         ||
+||                           j2-2_bud_2_Aligned.sortedByCoord.out.bam         ||
+||                           j2-2_bud_3_Aligned.sortedByCoord.out.bam         ||
+||                                                                            ||
+||             Output file : hcr3-paper_total-RNAseq.featureCounts.txt        ||
+||                 Summary : hcr3-paper_total-RNAseq.featureCounts.txt.su ... ||
+||              Paired-end : yes                                              ||
+||        Count read pairs : no                                               ||
+||              Annotation : Araport11_GTF_genes_transposons.Mar92021.gtf ... ||
+||      Dir for temp files : /datasets/data_4/nison/hcr3/HCR3_public_rele ... ||
+||                                                                            ||
+||                 Threads : 20                                               ||
+||                   Level : meta-feature level                               ||
+||      Multimapping reads : not counted                                      ||
+|| Multi-overlapping reads : not counted                                      ||
+||   Min overlapping bases : 1                                                ||
+||                                                                            ||
+\\============================================================================//
+
+//================================= Running ==================================\\
+||                                                                            ||
+|| Load annotation file Araport11_GTF_genes_transposons.Mar92021.gtf ...      ||
+||    Features : 200426                                                       ||
+||    Meta-features : 36799                                                   ||
+||    Chromosomes/contigs : 7                                                 ||
+||                                                                            ||
+|| Process BAM file Col_s_1_Aligned.sortedByCoord.out.bam...                  ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 73208762                                             ||
+||    Successfully assigned alignments : 66589231 (91.0%)                     ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Col_s_2_Aligned.sortedByCoord.out.bam...                  ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 72846196                                             ||
+||    Successfully assigned alignments : 66876257 (91.8%)                     ||
+||    Running time : 0.12 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Col_s_3_Aligned.sortedByCoord.out.bam...                  ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 73039710                                             ||
+||    Successfully assigned alignments : 66709725 (91.3%)                     ||
+||    Running time : 0.12 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Col_b_1_Aligned.sortedByCoord.out.bam...                  ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 74269736                                             ||
+||    Successfully assigned alignments : 67724796 (91.2%)                     ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Col_b_2_Aligned.sortedByCoord.out.bam...                  ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 73964140                                             ||
+||    Successfully assigned alignments : 67070465 (90.7%)                     ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Col_b_3_Aligned.sortedByCoord.out.bam...                  ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 65874006                                             ||
+||    Successfully assigned alignments : 59977073 (91.0%)                     ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file col-bud-1_Aligned.sortedByCoord.out.bam...                ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 85068918                                             ||
+||    Successfully assigned alignments : 79332817 (93.3%)                     ||
+||    Running time : 0.62 minutes                                             ||
+||                                                                            ||
+|| Process BAM file col-bud-2_Aligned.sortedByCoord.out.bam...                ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 84984836                                             ||
+||    Successfully assigned alignments : 79233464 (93.2%)                     ||
+||    Running time : 0.65 minutes                                             ||
+||                                                                            ||
+|| Process BAM file col-bud-3_Aligned.sortedByCoord.out.bam...                ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 84970072                                             ||
+||    Successfully assigned alignments : 79594015 (93.7%)                     ||
+||    Running time : 0.64 minutes                                             ||
+||                                                                            ||
+|| Process BAM file hcr3-bud-1_Aligned.sortedByCoord.out.bam...               ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 85727916                                             ||
+||    Successfully assigned alignments : 79213661 (92.4%)                     ||
+||    Running time : 0.65 minutes                                             ||
+||                                                                            ||
+|| Process BAM file hcr3-bud-2_Aligned.sortedByCoord.out.bam...               ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 85608506                                             ||
+||    Successfully assigned alignments : 79249767 (92.6%)                     ||
+||    Running time : 0.67 minutes                                             ||
+||                                                                            ||
+|| Process BAM file hcr3-bud-3_Aligned.sortedByCoord.out.bam...               ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 85191046                                             ||
+||    Successfully assigned alignments : 79487768 (93.3%)                     ||
+||    Running time : 0.68 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Col_bud_1_Aligned.sortedByCoord.out.bam...                ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 73364978                                             ||
+||    Successfully assigned alignments : 64598932 (88.1%)                     ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Col_bud_2_Aligned.sortedByCoord.out.bam...                ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 66341798                                             ||
+||    Successfully assigned alignments : 59106594 (89.1%)                     ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Col_bud_3_Aligned.sortedByCoord.out.bam...                ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 73939956                                             ||
+||    Successfully assigned alignments : 65264119 (88.3%)                     ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file j3-3_bud_1_Aligned.sortedByCoord.out.bam...               ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 73840984                                             ||
+||    Successfully assigned alignments : 67047685 (90.8%)                     ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Process BAM file j3-3_bud_2_Aligned.sortedByCoord.out.bam...               ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 73597762                                             ||
+||    Successfully assigned alignments : 66014936 (89.7%)                     ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file j3-3_bud_3_Aligned.sortedByCoord.out.bam...               ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 73788260                                             ||
+||    Successfully assigned alignments : 66683349 (90.4%)                     ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Process BAM file j2-2_bud_1_Aligned.sortedByCoord.out.bam...               ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 73890748                                             ||
+||    Successfully assigned alignments : 65225802 (88.3%)                     ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file j2-2_bud_2_Aligned.sortedByCoord.out.bam...               ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 74199074                                             ||
+||    Successfully assigned alignments : 64868958 (87.4%)                     ||
+||    Running time : 0.11 minutes                                             ||
+||                                                                            ||
+|| Process BAM file j2-2_bud_3_Aligned.sortedByCoord.out.bam...               ||
+||    Strand specific : reversely stranded                                    ||
+||    Paired-end reads are included.                                          ||
+||    The reads are assigned on the single-end mode.                          ||
+||    Total alignments : 73858520                                             ||
+||    Successfully assigned alignments : 64351040 (87.1%)                     ||
+||    Running time : 0.10 minutes                                             ||
+||                                                                            ||
+|| Write the final count table.                                               ||
+|| Write the read assignment summary.                                         ||
+||                                                                            ||
+|| Summary of counting results can be found in file "/datasets/data_4/nison/  ||
+|| hcr3/HCR3_public_release/RNA-seq/meiotic_gene_expression/featureCount/hcr  ||
+|| 3-paper_total-RNAseq.featureCounts.txt.summary"                            ||
+||                                                                            ||
+\\============================================================================//
+

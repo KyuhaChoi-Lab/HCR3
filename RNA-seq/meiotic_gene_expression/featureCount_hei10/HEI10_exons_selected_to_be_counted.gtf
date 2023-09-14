@@ -1,0 +1,5 @@
+Chr1	Araport11	gene	19963267	19966952	.	+	.	transcript_id "AT1G53490"; gene_id "AT1G53490";
+Chr1	Araport11	exon	19965108	19965215	.	+	.	transcript_id "AT1G53490.1"; gene_id "AT1G53490";
+Chr1	Araport11	exon	19965298	19965370	.	+	.	transcript_id "AT1G53490.1,AT1G53490.2"; gene_id "AT1G53490";
+Chr1	Araport11	exon	19965455	19965500	.	+	.	transcript_id "AT1G53490.1,AT1G53490.2"; gene_id "AT1G53490";
+Chr1	Araport11	exon	19965605	19965635	.	+	.	transcript_id "AT1G53490.1,AT1G53490.2"; gene_id "AT1G53490";
