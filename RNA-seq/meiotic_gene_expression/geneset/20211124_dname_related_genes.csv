@@ -1,0 +1,50 @@
+# DNA methylation-related genes selected from,,,,
+# 1. Erdmann,2020,,, Plos Gen.
+# 2. Zhang,2018,,, Nat.Rev.Mole.Cell.Biol
+# 3. Zemach,2013,,, Cell
+agi,gene,pathway,GROUP1,GROUP2
+AT1G15215,SHH1,canonical,sRNA,RdDM
+AT3G42670,CLSY1,canonical,sRNA,RdDM
+AT5G20420,CLSY2,canonical,sRNA,RdDM
+AT1G05490,CLSY3,canonical,targeting_PolIV,RdDM
+AT3G24340,CLSY4,canonical,targeting_PolIV,RdDM
+AT2G33290,SUVH2,all,targeting_methylation,RdDM
+AT4G13460,SUVH9,all,targeting_methylation,RdDM
+AT2G16390,DRD1,all,targeting_methylation,RdDM
+AT3G49250,DMS3,all,targeting_methylation,RdDM
+AT3G22680,RDM1,all,targeting_methylation,RdDM
+AT5G04290,KTF1,all,targeting_methylation,RdDM
+AT1G63020,NRPD1,canonical,sRNA,RdDM
+AT2G40030,NRPE1,all,targeting_methylation,RdDM
+AT4G11130,RDR2,canonical,sRNA,RdDM
+AT3G43920,DCL3,canonical,sRNA,RdDM
+AT2G27040,AGO4,canonical,targeting_methylation,RdDM
+AT5G14620,DRM2,all,de_novo_methylation,RdDM
+AT5G49160,MET1,,,maintenance
+AT4G19020,CMT2,,,maintenance
+AT1G69770,CMT3,,,maintenance
+AT5G04560,DME,,,demethylation
+AT2G36490,ROS1,,,demethylation
+AT3G10010,DML2,,,demethylation
+AT4G34060,DML3,,,demethylation
+AT3G14980,IDM1,,,demethylation
+AT1G54840,IDM2,,,demethylation
+AT1G20870,IDM3,,,demethylation
+AT5G59800,MBD7,,,demethylation
+AT4G20910,HEN1,all,sRNA,RdDM
+AT2G32940,AGO6,all,targeting_methylation,RdDM
+AT5G21150,AGO9,canonical,targeting_methylation,RdDM
+AT3G48670,IDN2,all,targeting_methylation,RdDM
+AT1G15910,IDP,all,targeting_methylation,RdDM
+AT3G49500,RDR6,non_canonical,sRNA,RdDM
+AT1G01040,DCL1,non_canonical,sRNA,RdDM
+AT3G03300,DCL2,non_canonical,sRNA,RdDM
+AT5G20320,DCL4,non_canonical,sRNA,RdDM
+AT1G48410,AGO1,non_canonical,sRNA,RdDM
+AT1G72270,HDP1,,,demethylation
+AT4G31270,HDP2,,,demethylation
+AT5G66750,DDM1,,,histone_modification
+AT3G07610,IBM1,,,histone_modification
+AT3G12810,PIE1,,,histone_modification
+AT3G33520,ARP6,,,histone_modification
+AT3G01460,MBD9,,,histone_modification
