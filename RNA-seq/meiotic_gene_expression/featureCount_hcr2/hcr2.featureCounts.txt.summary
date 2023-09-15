@@ -1,0 +1,15 @@
+Status	/datasets/data_4/nison/hcr2/RNA-seq/02_STAR/Col-0-seedling1_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/hcr2/RNA-seq/02_STAR/Col-0-seedling2_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/hcr2/RNA-seq/02_STAR/Col-0-seedling3_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/hcr2/RNA-seq/02_STAR/Col-0-seedling4_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/hcr2/RNA-seq/02_STAR/Col-0-bud-19_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/hcr2/RNA-seq/02_STAR/Col-0-bud-20_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/hcr2/RNA-seq/02_STAR/Col-0-bud-21_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/hcr2/RNA-seq/02_STAR/Col-0-bud-22_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/hcr2/RNA-seq/02_STAR/hcr2-bud-23_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/hcr2/RNA-seq/02_STAR/hcr2-bud-24_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/hcr2/RNA-seq/02_STAR/hcr2-bud-25_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/hcr2/RNA-seq/02_STAR/hcr2-bud-26_Aligned.sortedByCoord.out.bam
+Assigned	31378831	37077340	34384104	34007364	25235353	34622178	27854921	27282509	24408067	24391583	27935797	24580854
+Unassigned_Unmapped	0	0	0	0	0	0	0	0	0	0	0	0
+Unassigned_Read_Type	0	0	0	0	0	0	0	0	0	0	0	0
+Unassigned_Singleton	0	0	0	0	0	0	0	0	0	0	0	0
+Unassigned_MappingQuality	0	0	0	0	0	0	0	0	0	0	0	0
+Unassigned_Chimera	0	0	0	0	0	0	0	0	0	0	0	0
+Unassigned_FragmentLength	0	0	0	0	0	0	0	0	0	0	0	0
+Unassigned_Duplicate	0	0	0	0	0	0	0	0	0	0	0	0
+Unassigned_MultiMapping	2566616	3005498	2836954	2783634	4634918	6446130	5084914	4913658	4922354	4862904	5602544	4940734
+Unassigned_Secondary	0	0	0	0	0	0	0	0	0	0	0	0
+Unassigned_NonSplit	0	0	0	0	0	0	0	0	0	0	0	0
+Unassigned_NoFeatures	3190029	3702683	3574979	3561027	2832995	3797252	3183468	3323281	2619150	2611801	2978741	2492091
+Unassigned_Overlapping_Length	0	0	0	0	0	0	0	0	0	0	0	0
+Unassigned_Ambiguity	306506	360227	333917	330193	265282	376352	287693	269246	305525	301842	353316	318775
