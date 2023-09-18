@@ -28,12 +28,16 @@ colnames(goi)[1] <- "func"
 
 ## log2fold changes, DEG= padj < 0.01
 # l2fc.col_b_s <- read_csv(file.path(dirdeseq, "deseq_results", "deseqResShrunken_col-b_vs_col-s.csv"), col_names=T)
-l2fc.col_b_s <- read_csv(file.path(dirdeseq, "deseqResShrunken_col-b_vs_col-s.csv"), col_names=T)
+l2fc.col_b_s_1 <- read_csv(file.path(dirdeseq, "deseqResShrunken_col-b_vs_col-s_from_hcr2.csv"), col_names=T)
+l2fc.col_b_s_2 <- read_csv(file.path(dirdeseq, "deseqResShrunken_col-b_vs_col-s_from_hcr11-D.csv"), col_names=T)
+l2fc.hcr2_col <- read_csv(file.path(dirdeseq, "deseqResShrunken_hcr3_vs_col_bud.csv"), col_names=T)
 l2fc.hcr3_col <- read_csv(file.path(dirdeseq, "deseqResShrunken_hcr3_vs_col_bud.csv"), col_names=T)
 l2fc.j2_col <- read_csv(file.path(dirdeseq, "deseqResShrunken_j2_vs_col_bud.csv"), col_names=T)
 l2fc.j3_col <- read_csv(file.path(dirdeseq, "deseqResShrunken_j3_vs_col_bud.csv"), col_names=T)
 
-colnames(l2fc.col_b_s)[1] <- "AGI"
+colnames(l2fc.col_b_s_1)[1] <- "AGI"
+colnames(l2fc.col_b_s_2)[1] <- "AGI"
+colnames(l2fc.hcr2_col)[1] <- "AGI"
 colnames(l2fc.hcr3_col)[1] <- "AGI"
 colnames(l2fc.j2_col)[1] <- "AGI"
 colnames(l2fc.j3_col)[1] <- "AGI"
@@ -52,18 +56,22 @@ join_l2fc <- function(query, l2fc){
         dplyr::select(c("func", "symbol", "AGI", "log2FoldChange"))
 }
 
-goi.l2fc.col_b_s <- join_l2fc(goi, l2fc.col_b_s)
+goi.l2fc.col_b_s_1 <- join_l2fc(goi, l2fc.col_b_s_1)
+goi.l2fc.col_b_s_2 <- join_l2fc(goi, l2fc.col_b_s_2)
+goi.l2fc.hcr2_col <- join_l2fc(goi, l2fc.hcr2_col)
 goi.l2fc.hcr3_col <- join_l2fc(goi, l2fc.hcr3_col)
 goi.l2fc.j2_col <- join_l2fc(goi, l2fc.j2_col)
 goi.l2fc.j3_col <- join_l2fc(goi, l2fc.j3_col)
 
-mei.l2fc <- left_join(goi.l2fc.col_b_s, goi.l2fc.hcr3_col, by=c("func", "symbol", "AGI")) %>%
+mei.l2fc <- left_join(goi.l2fc.col_b_s_1, goi.l2fc.col_b_s_2, by=c("func", "symbol", "AGI")) %>%
+    left_join(goi.l2fc.hcr2_col, by=c("func", "symbol", "AGI")) %>%
+    left_join(goi.l2fc.hcr3_col, by=c("func", "symbol", "AGI")) %>%
     left_join(goi.l2fc.j2_col, by=c("func", "symbol", "AGI")) %>%
     left_join(goi.l2fc.j3_col, by=c("func", "symbol", "AGI"))
 
-colnames(mei.l2fc)[4:7] <- c("bud/sdl", "hcr3/col", "j2/col", "j3/col")
+colnames(mei.l2fc)[4:9] <- c("bud/sdl_1", "bud/sdl_2", "hcr2/col", "hcr3/col", "j2/col", "j3/col")
 
-mei.l2fc <- pivot_longer(mei.l2fc, 4:7, names_to="group", values_to="log2fc") %>%
+mei.l2fc <- pivot_longer(mei.l2fc, 4:9, names_to="group", values_to="log2fc") %>%
 		filter(func  != "HSF") %>%
         mutate(log2fc = case_when(abs(log2fc) < 0.5 ~ 0,
                                    TRUE ~ log2fc ))
