@@ -64,6 +64,12 @@ colnames(cts_clpt_hei10)[7:ncol(cts_clpt_hei10)] <- sample_names_clpt
 colnames(cts_hcr10D)[7:ncol(cts_hcr10D)] <- sample_names_hcr10D
 colnames(cts_hcr10D_hei10)[7:ncol(cts_hcr10D_hei10)] <- sample_names_hcr10D
 
+# Deselect Col_s replicate 1, 2 of hcr2 dataset
+cts_hcr2 <- cts_hcr2 %>%
+    dplyr::select(-c("Col_s_D_1", "Col_s_D_2"))
+cts_hcr2_hei10 <- cts_hcr2_hei10 %>%
+    dplyr::select(-c("Col_s_D_1", "Col_s_D_2"))
+
 # Add Col_s, Col_b, hcr2_b data from hcr2 dataset (set D)
 # Add Col_s data from clpt dataset (set E)
 # Add Col_s, Col_b data from hcr10D (set F)
@@ -84,11 +90,11 @@ cts_total <- cts_wo_hei10 %>%
 
 #---- Create 'coldata' containing sample info, which is required for DESeq2 function
 # create 'coldata'  containing sample info.
-genotype <- c(rep(c("Col_s_A", "Col_b_A", "Col_b_B", "hcr3_b_B", "Col_b_C", "j3_b_C", "j2_b_C"), each=3), rep(c("Col_s_D", "Col_b_D", "hcr2_b"), each=4), rep("Col_s_E", times=3), rep(c("Col_s_F", "Col_b_F"), each=3)) # modify 3 
+genotype <- c(rep(c("Col_s_A", "Col_b_A", "Col_b_B", "hcr3_b_B", "Col_b_C", "j3_b_C", "j2_b_C"), each=3), c("Col_s_D", "Col_s_D"), rep(c("Col_b_D", "hcr2_b"), each=4), rep("Col_s_E", times=3), rep(c("Col_s_F", "Col_b_F"), each=3)) # modify 3 
 genotype <- factor(genotype)
 genotype <- relevel(genotype, ref="Col_s_A")
 coldata <- data.frame(genotype=genotype,row.names=colnames(cts_total))
-coldata$replicate <- c(rep(c("r1", "r2", "r3"), times=7), rep(c("r1", "r2", "r3", "r4"), times=3), "r1", "r2", "r3", rep(c("r1", "r2", "r3"), times=2)) # modify 5
+coldata$replicate <- c(rep(c("r1", "r2", "r3"), times=7), c("r1", "r2"), rep(c("r1", "r2", "r3", "r4"), times=2), "r1", "r2", "r3", rep(c("r1", "r2", "r3"), times=2)) # modify 5
 
 # ...Now inputs for DESeq2 are ready...
 
@@ -148,7 +154,8 @@ deseqRes <- function(dat, cgroup, egroup){
 ## DESeq2 perform independent filtering of low number-reads for efficient multiple testing
 
 ## Col_b/Col_s from hcr2 dataset
-### HEI10 readcount of Col_s from hcr2 dataset is too high
+### HEI10 readcount of Col_s rep1, 2 from hcr2 dataset is too high
+### So I excluded Col_s rep1, 2 from the dataset.
 res_colb_cols_1 <- deseqRes(dds, "Col_s_D", "Col_b_D")
 
 ## Col_b/Col_s from hcr11D dataset
