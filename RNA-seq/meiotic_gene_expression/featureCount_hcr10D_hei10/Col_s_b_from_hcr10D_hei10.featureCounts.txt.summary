@@ -1,0 +1,15 @@
+Status	/datasets/data_4/nison/NGS_libraries/RNAseq_hcr10D-series_bud-seedling/01_STAR/Col_s_1_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/NGS_libraries/RNAseq_hcr10D-series_bud-seedling/01_STAR/Col_s_2_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/NGS_libraries/RNAseq_hcr10D-series_bud-seedling/01_STAR/Col_s_3_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/NGS_libraries/RNAseq_hcr10D-series_bud-seedling/01_STAR/Col_1_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/NGS_libraries/RNAseq_hcr10D-series_bud-seedling/01_STAR/Col_2_Aligned.sortedByCoord.out.bam	/datasets/data_4/nison/NGS_libraries/RNAseq_hcr10D-series_bud-seedling/01_STAR/Col_3_Aligned.sortedByCoord.out.bam
+Assigned	27	24	33	122	95	137
+Unassigned_Unmapped	0	0	0	0	0	0
+Unassigned_Read_Type	0	0	0	0	0	0
+Unassigned_Singleton	0	0	0	0	0	0
+Unassigned_MappingQuality	0	0	0	0	0	0
+Unassigned_Chimera	0	0	0	0	0	0
+Unassigned_FragmentLength	0	0	0	0	0	0
+Unassigned_Duplicate	0	0	0	0	0	0
+Unassigned_MultiMapping	3347100	3332468	3347320	4160530	4321192	4100036
+Unassigned_Secondary	0	0	0	0	0	0
+Unassigned_NonSplit	0	0	0	0	0	0
+Unassigned_NoFeatures	70217203	70129526	70103181	69619122	69998223	69925885
+Unassigned_Overlapping_Length	0	0	0	0	0	0
+Unassigned_Ambiguity	0	0	0	0	0	0
