@@ -32,6 +32,7 @@ colnames(goi)[1] <- "func"
 l2fc.col_b_s_1 <- read_csv(file.path(dirdeseq, "deseqResShrunken_col-b_vs_col-s_from_hcr2.csv"), col_names=T)
 l2fc.col_b_s_2 <- read_csv(file.path(dirdeseq, "deseqResShrunken_col-b_vs_col-s_from_hcr11-D.csv"), col_names=T)
 l2fc.col_b_s_3 <- read_csv(file.path(dirdeseq, "deseqResShrunken_col-b-from-_col-s_from_clpt_col-b_from_hcr2.csv"), col_names=T)
+l2fc.col_b_s_4 <- read_csv(file.path(dirdeseq, "deseqResShrunken_col-b_vs_col-s_from_hcr10-D.csv"), col_names=T)
 l2fc.hcr2_col <- read_csv(file.path(dirdeseq, "deseqResShrunken_hcr2_vs_col_bud.csv"), col_names=T)
 l2fc.hcr3_col <- read_csv(file.path(dirdeseq, "deseqResShrunken_hcr3_vs_col_bud.csv"), col_names=T)
 l2fc.j2_col <- read_csv(file.path(dirdeseq, "deseqResShrunken_j2_vs_col_bud.csv"), col_names=T)
@@ -40,6 +41,7 @@ l2fc.j3_col <- read_csv(file.path(dirdeseq, "deseqResShrunken_j3_vs_col_bud.csv"
 colnames(l2fc.col_b_s_1)[1] <- "AGI"
 colnames(l2fc.col_b_s_2)[1] <- "AGI"
 colnames(l2fc.col_b_s_3)[1] <- "AGI"
+colnames(l2fc.col_b_s_4)[1] <- "AGI"
 colnames(l2fc.hcr2_col)[1] <- "AGI"
 colnames(l2fc.hcr3_col)[1] <- "AGI"
 colnames(l2fc.j2_col)[1] <- "AGI"
@@ -66,6 +68,7 @@ join_l2fc <- function(query, l2fc){
 goi.l2fc.col_b_s_1 <- join_l2fc(goi, l2fc.col_b_s_1)
 goi.l2fc.col_b_s_2 <- join_l2fc(goi, l2fc.col_b_s_2)
 goi.l2fc.col_b_s_3 <- join_l2fc(goi, l2fc.col_b_s_3)
+goi.l2fc.col_b_s_4 <- join_l2fc(goi, l2fc.col_b_s_4)
 goi.l2fc.hcr2_col <- join_l2fc(goi, l2fc.hcr2_col)
 goi.l2fc.hcr3_col <- join_l2fc(goi, l2fc.hcr3_col)
 goi.l2fc.j2_col <- join_l2fc(goi, l2fc.j2_col)
@@ -73,19 +76,20 @@ goi.l2fc.j3_col <- join_l2fc(goi, l2fc.j3_col)
 
 mei.l2fc <- left_join(goi.l2fc.col_b_s_1, goi.l2fc.col_b_s_2, by=c("func", "symbol", "AGI")) %>%
     left_join(goi.l2fc.col_b_s_3, by=c("func", "symbol", "AGI")) %>%
+    left_join(goi.l2fc.col_b_s_4, by=c("func", "symbol", "AGI")) %>%
     left_join(goi.l2fc.hcr2_col, by=c("func", "symbol", "AGI")) %>%
     left_join(goi.l2fc.hcr3_col, by=c("func", "symbol", "AGI")) %>%
     left_join(goi.l2fc.j2_col, by=c("func", "symbol", "AGI")) %>%
     left_join(goi.l2fc.j3_col, by=c("func", "symbol", "AGI"))
 
-colnames(mei.l2fc)[4:ncol(mei.l2fc)] <- c("bud/sdl_1", "bud/sdl_2", "bud/sdl_3", "hcr2/col", "hcr3/col", "j2/col", "j3/col")
+colnames(mei.l2fc)[4:ncol(mei.l2fc)] <- c("bud/sdl_1", "bud/sdl_2", "bud/sdl_3", "bud/sdl_4", "hcr2/col", "hcr3/col", "j2/col", "j3/col")
 
 mei.l2fc <- pivot_longer(mei.l2fc, 4:ncol(mei.l2fc), names_to="group", values_to="log2fc") %>%
-		filter(func  != "HSF")
-        # mutate(log2fc = case_when(abs(log2fc) < 0.5 ~ 0,
-        #                            TRUE ~ log2fc ))
+		filter(func  != "HSF") %>%
+        mutate(log2fc = case_when(abs(log2fc) < 0.5 ~ 0,
+                                   TRUE ~ log2fc ))
 
-mei.l2fc.fin <- filter(mei.l2fc, !(group %in% c("bud/sdl_1", "bud/sdl_2")))
+mei.l2fc.fin <- filter(mei.l2fc, !(group %in% c("bud/sdl_2", "bud/sdl_3", "bud/sdl_4")))
 ##}}}
 
 
@@ -126,6 +130,8 @@ pal_bar <- color("bright")(7)[c("blue", "green")]
 names(pal_bar) <- c("seedling", "bud")
 
 # Use Col_s of clpt and Col_b of hcr2
-ncts2 <- ncts %>%
-    dplyr::select(1:7) %>%
-    filter(...1 %in% c("AT3G44110", "AT5G22060"))
+# ncts2 <- ncts %>%
+#     dplyr::select(c(1,23:28)) %>%
+#     filter(...1 %in% c("AT3G44110", "AT5G22060"))
+
+# colnames(ncts2)[1] <- "AGI"

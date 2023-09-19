@@ -26,10 +26,11 @@ readcount.summary <- group_by(readcount, gene, sample) %>%
             sdCount = sd(normCount))
 
 write_csv(readcount, file="results/j2_j3_normalized_readcount.csv")
+write_csv(readcount.summary, file="results/j2_j3_normalized_readcount_summary.csv")
 
 # read count bar plots
 
-pBar <- ggplot() +
+pBar_byGene <- ggplot() +
         geom_col(data=readcount.summary, aes(x=gene, y=meanCount, group=sample), position=position_dodge(width=0.9), colour="black", fill=NA, width=0.8) +
 		geom_jitter(data=readcount, aes(x=gene, y=normCount, group=sample, fill=sample), shape=21, colour="black", size=1, position=position_jitterdodge(dodge.width=0.9, jitter.width=0.35, jitter.height=0)) +
 		geom_errorbar(data=readcount.summary, aes(x=gene, ymin=(meanCount - sdCount), ymax=(meanCount + sdCount), group=sample), width=0.2, colour="black", position=position_dodge(width=0.9)) +
@@ -49,6 +50,20 @@ pBar <- ggplot() +
 		# theme(axis.text.x=element_text(angle=30, hjust=1, vjust=1))
 		# labs(title="read count CLPT1 exon 1-3\n(Chr4:12972747-12973305)")
 
+pBar_bySample <- ggplot() +
+        geom_col(data=readcount.summary, aes(x=sample, y=meanCount, group=gene), position=position_dodge(width=0.9), colour="black", fill=NA, width=0.8) +
+		# geom_jitter(data=readcount, aes(x=sample, y=normCount, group=gene, fill=gene), shape=21, colour="black", size=1, position=position_jitterdodge(dodge.width=0.9, jitter.width=0.35, jitter.height=0)) +
+		geom_jitter(data=readcount, aes(x=sample, y=normCount, group=gene, colour=gene), size=1, position=position_jitterdodge(dodge.width=0.9, jitter.width=0.35, jitter.height=0)) +
+		geom_errorbar(data=readcount.summary, aes(x=sample, ymin=(meanCount - sdCount), ymax=(meanCount + sdCount), group=gene), width=0.2, colour="black", position=position_dodge(width=0.9)) +
+        scale_colour_manual(values=c("J2"="#0000bd", "J3"="#b30000")) +
+        # scale_colour_manual(values=pal) +
+		# geom_point(data=readtab.summary, aes(x=genotype, meanCount), colour="red", size=0.4) +
+		# scale_y_continuous(limits=c(0, 1800)) +
+		theme_classic() +
+		theme(text=element_text(size=8, family="Helvetica", colour="black")) +
+        labs(y="Normalized Count") +
+        theme(axis.title.x = element_blank())
+
 addSmallLegend <- function(myplot, pointSize=0.5, textSize=3, spaceLegend = 0.1) {
     myplot +
         guides(shape = guide_legend(override.aes = list(size = pointSize)),
@@ -58,12 +73,21 @@ addSmallLegend <- function(myplot, pointSize=0.5, textSize=3, spaceLegend = 0.1)
                 legend.key.size = unit(spaceLegend, "lines"))
 }
 
-pBar.smalllegend <- addSmallLegend(pBar, pointSize=1, textSize=7, spaceLegend = 0.2)
-pdf(file="results/j2_j3_expression_normcount.pdf", width=2.5, height=1.5)
-print(pBar.smalllegend)
+pBar_byGene.smalllegend <- addSmallLegend(pBar_byGene, pointSize=1, textSize=7, spaceLegend = 0.2)
+pBar_bySample.smalllegend <- addSmallLegend(pBar_bySample, pointSize=1, textSize=7, spaceLegend = 0.2)
+
+pdf(file="results/j2_j3_expression_normcount_by_Gene.pdf", width=2.5, height=1.5)
+print(pBar_byGene.smalllegend)
 dev.off()
-png(file="results/j2_j3_expression_normcount.png", width=2.5, height=1.5, unit="in", res=300)
-print(pBar.smalllegend)
+png(file="results/j2_j3_expression_normcount_by_Gene.png", width=2.5, height=1.5, unit="in", res=300)
+print(pBar_byGene.smalllegend)
+dev.off()
+
+pdf(file="results/j2_j3_expression_normcount_by_Sample.pdf", width=2.5, height=1.5)
+print(pBar_bySample.smalllegend)
+dev.off()
+png(file="results/j2_j3_expression_normcount_by_Sample.png", width=2.5, height=1.5, unit="in", res=300)
+print(pBar_bySample.smalllegend)
 dev.off()
 
 # readcount Crossbar 
